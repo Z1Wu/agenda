@@ -6,41 +6,40 @@ import (
 	"fmt"
 )
 
-//create a meeting
-//@param userName the sponsor's userName
-//@param title the meeting's title
-//@param participator the meeting's participator
-//@param startData the meeting's start date
-//@param endData the meeting's end date
-//@return if success, true will be returned
+// 创建会议
+/*
+已登录的用户可以添加一个新会议到其议程安排中。会议可以在多个已注册 用户间举行，不允许包含未注册用户。添加会议时提供的信息应包括：
+	会议主题(title)（在会议列表中具有唯一性）
+	会议参与者(participator)
+	会议起始时间(startDate)
+	会议结束时间(endDate)
+1.注意，任何用户都无法分身参加多个会议。如果用户已有的会议安排（作为发起者或参与者）
+  与将要创建的会议在时间上重叠 （允许仅有端点重叠的情况），则无法创建该会议。
+2.用户应获得适当的反馈信息，以便得知是成功地创建了新会议，还是在创建过程中出现了某些错误。
+*/
 func CreateMeeting(userName, title, startDate, endDate string, participator []string) bool {
-	var sd Date
-	var ed Date
-	sd = buildDateFromString(startDate)
-	ed = buildDateFromString(endDate)
+	var start Date
+	var end Date
+	start = buildDateFromString(startDate)
+	end = buildDateFromString(endDate)
 
-	if (!sd.isValid()) || (!ed.isValid()) {
+	if (!start.isValid()) || (!end.isValid()) {
 		fmt.Println("日期不合法")
 		return false
 	}
-	if sd.GreaterOrEqual(ed) {
-		fmt.Println("开始日期不可大于结束日期")
+	if start.GreaterOrEqual(end) {
+		fmt.Println("开始日期不可大于或等于结束日期")
 		return false
 	}
 
-	/*-------------------1-------------------------*/
-	uf := func(u *User) bool {
-		return userName == u.getName()
-	}
-
-	ulist := queryUser(uf)
-	if len(ulist) == 0 {
-		fmt.Println("发起人未注册")
+	/*-----------检查发起人是否登陆用户----------------*/
+	if userName != CurrentUser.getName() {
+		fmt.Println("发起人非登陆用户")
 		return false
 	}
 
-	/*-------------------2-------------------------*/
-	uf2 := func(u *User) bool {
+	/*----------------是否包含未注册用户--------------*/
+	userfilter := func(u *User) bool {
 		for _, p := range participator {
 			if p == u.getName() {
 				return true
@@ -48,50 +47,50 @@ func CreateMeeting(userName, title, startDate, endDate string, participator []st
 		}
 		return false
 	}
-	ulist2 := queryUser(uf2)
-	if len(ulist2) != len(participator) {
+	userlist := queryUser(userfilter)
+	if len(userlist) != len(participator) {
 		fmt.Println("存在参与者未注册")
 		return false
 	}
 
-	/*-------------------3-------------------------*/
-	uf3 := func(m *Meeting) bool {
+	/*-------------检查会议主题是否存在----------------*/
+	meetingfilter1 := func(m *Meeting) bool {
 		return title == m.getTitle()
 	}
-	ulist3 := queryMeeting(uf3)
-	if len(ulist3) != 0 {
+	meetinglist1 := queryMeeting(meetingfilter1)
+	if len(meetinglist1) != 0 {
 		fmt.Println("会议主题已存在")
 		return false
 	}
 
-	/*-------------------4--------------------------*/
-	uf4 := func(m *Meeting) bool {
+	/*-------------是否与发起人其他会议冲突----------------*/
+	meetingfilter2 := func(m *Meeting) bool {
 		if !(userName == m.getSponsor() || m.isParticipator(userName)) {
 			return false
 		}
 		if (userName == m.getSponsor() || m.isParticipator(userName)) &&
-			(sd.GreaterOrEqual(buildDateFromString(m.getEndDate())) ||
-				ed.SmallerOrEqual(buildDateFromString(m.getStartDate()))) {
+			(start.GreaterOrEqual(buildDateFromString(m.getEndDate())) ||
+				end.SmallerOrEqual(buildDateFromString(m.getStartDate()))) {
 			return false
 		} else {
 			return true
 		}
 	}
-	ulist4 := queryMeeting(uf4)
-	if len(ulist4) != 0 {
-		fmt.Println("与发起人或者参与者其他会议冲突")
+	meetinglist2 := queryMeeting(meetingfilter2)
+	if len(meetinglist2) != 0 {
+		fmt.Println("与发起人其他会议冲突")
 		return false
 	}
 
-	/*-------------------5--------------------------*/
-	uf5 := func(m *Meeting) bool {
+	/*---------------是否与参与者其他会议冲突---------------*/
+	meetingfilter3 := func(m *Meeting) bool {
 		for _, p := range participator {
 			if !(p == m.getSponsor() || m.isParticipator(p)) {
 				return false
 			}
 			if (p == m.getSponsor() || m.isParticipator(p)) &&
-				(sd.GreaterOrEqual(buildDateFromString(m.getEndDate())) ||
-					ed.SmallerOrEqual(buildDateFromString(m.getStartDate()))) {
+				(start.GreaterOrEqual(buildDateFromString(m.getEndDate())) ||
+					end.SmallerOrEqual(buildDateFromString(m.getStartDate()))) {
 				return false
 			} else {
 				return true
@@ -99,13 +98,13 @@ func CreateMeeting(userName, title, startDate, endDate string, participator []st
 		}
 		return false
 	}
-	ulist5 := queryMeeting(uf5)
-	if len(ulist5) != 0 {
-		fmt.Println("与发起人其他会议冲突")
+	meetinglist3 := queryMeeting(meetingfilter3)
+	if len(meetinglist3) != 0 {
+		fmt.Println("与参与者其他会议冲突")
 		return false
 	}
 
-	/*-------------------6--------------------------*/
+	/*------------参与者是否重复-------------*/
 
 	for i := 0; i < len(participator); i++ {
 		for j := i + 1; j < len(participator); j++ {
@@ -116,10 +115,10 @@ func CreateMeeting(userName, title, startDate, endDate string, participator []st
 		}
 	}
 
-	/*-------------------７--------------------------*/
+	/*--------------参与者中是否有发起者--------------------*/
 	for _, p := range participator {
 		if userName == p {
-			fmt.Println("参与者不能有发起者")
+			fmt.Println("参与者中不能有发起者")
 			return false
 		}
 	}
@@ -134,29 +133,30 @@ func CreateMeeting(userName, title, startDate, endDate string, participator []st
 	return true
 }
 
-/**
-* search a meeting by username, time interval (user as sponsor or participator)
-* @param uesrName the user's userName
-* @param startDate time interval's start date
-* @param endDate time interval's end date
-* @return a meeting list result
+/*
+*查询会议
+*
+*已登录的用户可以查询自己的议程在某一时间段(time interval)内的所有会议安排。
+*用户给出所关注时间段的起始时间和终止时间，返回该用户议程中在指定时间范围内找到的所有会议安排的列表。
+*在列表中给出每一会议的起始时间、终止时间、主题、以及发起者和参与者。
+*注意，查询会议的结果应包括用户作为 发起者或参与者 的会议
  */
 func MeetingQuery(sponsor, startDate, endDate string) []Meeting {
-	var ttt []Meeting
-	sd := buildDateFromString(startDate)
-	ed := buildDateFromString(endDate)
-	if sd.isMoreThan(ed) || !sd.isValid() || !ed.isValid() {
+	var temp []Meeting
+	start := buildDateFromString(startDate)
+	end := buildDateFromString(endDate)
+	if start.isMoreThan(end) || !start.isValid() || !end.isValid() {
 		fmt.Println("日期不合法")
-		return ttt //此时a为空
+		return temp //此时a为空
 	}
 
 	filter := func(a *Meeting) bool {
 		if (a.Sponsor == sponsor || a.isParticipator(sponsor)) &&
-			(buildDateFromString(a.getEndDate()).GreaterOrEqual(sd) && buildDateFromString(a.getStartDate()).SmallerOrEqual(sd)) {
+			(buildDateFromString(a.getEndDate()).GreaterOrEqual(start) && buildDateFromString(a.getStartDate()).SmallerOrEqual(start)) {
 			return true
 		}
 		if (a.Sponsor == sponsor || a.isParticipator(sponsor)) &&
-			(buildDateFromString(a.getStartDate()).SmallerOrEqual(ed)) && buildDateFromString(a.getStartDate()).GreaterOrEqual(sd) {
+			(buildDateFromString(a.getStartDate()).SmallerOrEqual(end)) && buildDateFromString(a.getStartDate()).GreaterOrEqual(start) {
 			return true
 		}
 		return false
@@ -164,24 +164,7 @@ func MeetingQuery(sponsor, startDate, endDate string) []Meeting {
 	return queryMeeting(filter)
 }
 
-/**
-* list all meetings the user take part in
-* @param userName user's username
-* @return a meeting list result
- */
-func ListAllMeetings(name string) []Meeting {
-	filter := func(a *Meeting) bool {
-		return a.Sponsor == name || a.isParticipator(name)
-	}
-	return queryMeeting(filter)
-}
-
-/**
-* delete a meeting by title and its sponsor
-* @param userName sponsor's username
-* @param title meeting's title
-* @return if success, true will be returned
- */
+/* list all meetings the user sponsor */
 func ListAllSponsorMeetings(name string) []Meeting {
 	filter := func(a *Meeting) bool {
 		return name == a.Sponsor
@@ -189,48 +172,48 @@ func ListAllSponsorMeetings(name string) []Meeting {
 	return queryMeeting(filter)
 }
 
-/**
-* list all meetings the user take part in and sponsor by other
-* @param userName user's username
-* @return a meeting list result
- */
-func ListAllParticipateMeetings(name string) []Meeting {
-	filter := func(a *Meeting) bool {
-		return a.isParticipator(name)
-	}
-	return queryMeeting(filter)
-}
-
-/**
-* delete a meeting by title and its sponsor
-* @param userName sponsor's username
-* @param title meeting's title
-* @return if success, true will be returned
- */
+/*
+取消会议
+1.已登录的用户可以取消 自己发起 的某一会议安排。
+2.取消会议时，需提供唯一标识：会议主题（title）。
+*/
 func DeleteMeeting(name, title string) bool {
+	if name != CurrentUser.getName() {
+		fmt.Println("非登陆用户")
+		return false
+	}
 	filter := func(a *Meeting) bool {
 		return a.Title == title && a.Sponsor == name
 	}
 	return deleteMeeting(filter) > 0
 }
 
-/**
-* delete all meetings by sponsor
-* @param userName sponsor's username
-* @return if success, true will be returned
- */
+/*
+清空会议
+1.已登录的用户可以清空 自己发起 的所有会议安排。
+*/
 func DeleteAllMeetings(name string) bool {
+	if name != CurrentUser.getName() {
+		fmt.Println("非登陆用户")
+		return false
+	}
+	if len(ListAllSponsorMeetings(name)) == 0 {
+		fmt.Println("该用户没有发起的会议")
+		return false
+	}
 	filter := func(a *Meeting) bool {
 		return a.Sponsor == name
 	}
 	return deleteMeeting(filter) > 0
 }
 
-/**
-* add participator into the meetings created by sponsor
-* @param title meeting's title
-* @return if success, true will be returned
- */
+/*
+增删会议参与者
+1.已登录的用户可以向 自己发起的某一会议增加/删除 参与者 。
+2.增加参与者时需要做 时间重叠 判断（允许仅有端点重叠的情况）。
+3.删除会议参与者后，若因此造成会议 参与者 人数为0，则会议也将被删除。
+*/
+/* 增加参会者 */
 func Addparticipator(title string, participator []string) bool {
 	/*---------------------1------------------------*/
 	if len(participator) == 0 {
@@ -273,16 +256,16 @@ func Addparticipator(title string, participator []string) bool {
 		}
 	}
 	/*-------------------6--------------------------*/
-	sd := buildDateFromString(mlist[0].StartDate)
-	ed := buildDateFromString(mlist[0].EndDate)
+	start := buildDateFromString(mlist[0].StartDate)
+	end := buildDateFromString(mlist[0].EndDate)
 	filter2 := func(m *Meeting) bool {
 		for _, p := range participator {
 			if !(p == m.getSponsor() || m.isParticipator(p)) {
 				return false
 			}
 			if (p == m.getSponsor() || m.isParticipator(p)) &&
-				(sd.GreaterOrEqual(buildDateFromString(m.getEndDate())) ||
-					ed.SmallerOrEqual(buildDateFromString(m.getStartDate()))) {
+				(start.GreaterOrEqual(buildDateFromString(m.getEndDate())) ||
+					end.SmallerOrEqual(buildDateFromString(m.getStartDate()))) {
 				return false
 			} else {
 				return true
@@ -296,27 +279,6 @@ func Addparticipator(title string, participator []string) bool {
 		return false
 	}
 
-	/*-------------------7--------------------------*/
-	filter3 := func(m *Meeting) bool {
-		for _, p := range participator {
-			if !(p == m.getSponsor() || m.isParticipator(p)) {
-				return false
-			}
-			if (p == m.getSponsor() || m.isParticipator(p)) &&
-				(sd.GreaterOrEqual(buildDateFromString(m.getEndDate())) ||
-					ed.SmallerOrEqual(buildDateFromString(m.getStartDate()))) {
-				return false
-			} else {
-				return true
-			}
-		}
-		return true
-	}
-	mlist2 := queryMeeting(filter3)
-	if len(mlist2) != 0 {
-		fmt.Println("添加的参与者与其他会议冲突")
-		return false
-	}
 	/*---------------------------------------------*/
 	//add
 	for _, p := range participator {
@@ -333,18 +295,14 @@ func Addparticipator(title string, participator []string) bool {
 	return true
 }
 
-/**
-* remove participator from the meetings created by sponsor
-* @param title meeting's title
-* @return if success, true will be returned
- */
+/* 删除参会者 */
 func Removeparticipator(title string, participator []string) bool {
 	/*---------------------1------------------------*/
 	if len(participator) == 0 {
 		fmt.Println("必须至少删除一个参与者")
 		return false
 	}
-	/*---------------------2------------------------*/
+
 	filter1 := func(m *Meeting) bool {
 		return m.Sponsor == CurrentUser.Name && m.Title == title
 	}
@@ -354,27 +312,27 @@ func Removeparticipator(title string, participator []string) bool {
 		fmt.Println("找不到当前用户创建的该会议")
 		return false
 	}
-	/*----------------------3-----------------------*/
+
 	for _, p := range participator {
 		if CurrentUser.Name == p {
 			fmt.Println("不能删除发起者,你可以退出会议（quit）")
 			return false
 		}
 	}
-	/*----------------------4-----------------------*/
+
 	if len(participator) > len(mlist[0].Participators) {
 		fmt.Println("删除人数不能大于原有人数")
 		return false
 	}
-	/*----------------------5-----------------------*/
+
 	for _, p := range participator {
 		if mlist[0].isParticipator(p) == false {
 			fmt.Println("存在待删除者没有参与该会议")
 			return false
 		}
 	}
-	/*----------------------6-----------------------*/
-	//delete
+
+	//delete participator
 	for _, p := range participator {
 		n := 0
 		for i, pp := range mlist[0].Participators {
@@ -385,7 +343,6 @@ func Removeparticipator(title string, participator []string) bool {
 		}
 		mlist[0].Participators = mlist[0].Participators[:len(mlist[0].Participators)-n]
 	}
-	/*----------------------7-----------------------*/
 
 	//重新写回meetingList
 	for i, m := range meetingList {
@@ -408,13 +365,13 @@ func Removeparticipator(title string, participator []string) bool {
 	return true
 }
 
-/**
-* CurrentUser quits meeting in which the currentUser participate
-* @param title meeting's title
-* @return if success, true will be returned
- */
+/*
+退出会议
+1.已登录的用户可以退出 自己参与 的某一会议安排。
+2.退出会议时，需提供一个唯一标识：会议主题（title）。若因此造成会议 参与者 人数为0，则会议也将被删除。
+*/
 func QuitMeeting(title string) bool {
-	/*---------------------1------------------------*/
+
 	filter1 := func(m *Meeting) bool {
 		return (m.Sponsor == CurrentUser.Name || m.isParticipator(CurrentUser.Name)) && m.Title == title
 	}
@@ -424,7 +381,7 @@ func QuitMeeting(title string) bool {
 		fmt.Println("找不到当前用户参加的该会议")
 		return false
 	}
-	/*----------------------2-----------------------*/
+
 	//当前用户为该会议的发起者，则删除该会议
 	if CurrentUser.Name == mlist[0].Sponsor {
 		if DeleteMeeting(CurrentUser.Name, title) {
@@ -433,8 +390,7 @@ func QuitMeeting(title string) bool {
 		}
 	}
 
-	/*----------------------3-----------------------*/
-	//delete
+	//delete CurrentUser
 	n := 0
 	for i, pp := range mlist[0].Participators {
 		if CurrentUser.Name == pp {
@@ -443,7 +399,6 @@ func QuitMeeting(title string) bool {
 		}
 	}
 	mlist[0].Participators = mlist[0].Participators[:len(mlist[0].Participators)-n]
-	/*----------------------7-----------------------*/
 
 	//重新写回meetingList
 	for i, m := range meetingList {
