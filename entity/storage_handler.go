@@ -93,26 +93,35 @@ func WriteToFile() {
 
 // 把当前登陆的用户名写入文件中
 func CacheLoginState() bool {
+	// os.Create("./data/cahce.json")
+	cache, err := os.Create("data/cache.json")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Fprintln(cache, CurrentUser.getName())
+	// writer  := bufio.Writer()
 	return true
 }
 
 // 恢复登陆用户状态
 func ResotreLoginState() (username string) {
 	username = ""
-	cache, err := os.Open("./data/cahce.json")
+	cache, err := os.Open("data/cache.json")
 	defer cache.Close()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Fail reading cache")
-	}
-	scanner := bufio.NewScanner(cache)
-	// scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		// username = (string)scanner.Text()
-	}
-
-	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
+
+	reader := bufio.NewReader(cache)
+
+	username, err = reader.ReadString('\n')
+
+	if err != nil && err != io.EOF {
+		log.Fatal(err)
+	}
+
 	return
 }
 

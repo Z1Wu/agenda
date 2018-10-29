@@ -14,23 +14,16 @@
 
 package main
 
-// import (
-// 	"github.com/Z1Wu/agenda/cmd"
-// )
-
-import (
-	"fmt"
-
-	entity "github.com/Z1Wu/agenda/entity"
-)
+import "github.com/Z1Wu/agenda/cmd"
 
 func main() {
-	// cmd.Execute()
-	entity.AgendaStart()
+	cmd.Execute()
+	// entity.AgendaStart()
 
-	entity.UserRegister("z1wu", "1111", "abc@qq.com", "12345")
+	// entity.UserRegister("z1wu", "1111", "abc@qq.com", "12345")
 
-	users := entity.ListAllUsers()
+	// users := entity.ListAllUsers()
 
-	fmt.Print(users)
+	// fmt.Print(users)
+
 }
