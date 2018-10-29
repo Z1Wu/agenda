@@ -14,8 +14,23 @@
 
 package main
 
-import "github.com/Z1Wu/agenda/cmd"
+// import (
+// 	"github.com/Z1Wu/agenda/cmd"
+// )
+
+import (
+	"fmt"
+
+	entity "github.com/Z1Wu/agenda/entity"
+)
 
 func main() {
-	cmd.Execute()
+	// cmd.Execute()
+	entity.AgendaStart()
+
+	entity.UserRegister("z1wu", "1111", "abc@qq.com", "12345")
+
+	users := entity.ListAllUsers()
+
+	fmt.Print(users)
 }

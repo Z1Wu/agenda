@@ -2,6 +2,15 @@ package entity
 
 // storage handler, read from file
 
+import (
+	"bufio"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"os"
+)
+
 type uFilter func(*User) bool
 
 // type uSwitcher func(*User)
@@ -15,15 +24,95 @@ var userList []User
 // CurrentUser is the login user, defined when login function invoked
 var CurrentUser User
 
+// var my_logger = log.
+
+// initfor test
+
 // ReadFromFile read the user and meeting from file
+// 把数据从文件中读取进入内存，包括用户信息和文件
 // TODO
 func ReadFromFile() {
+	//读user
+	file1, err1 := os.Open("./data/users.json")
+	defer file1.Close()
+	if err1 != nil {
+		// my_logger.Fatal("Failed to read file user.json")
+		fmt.Fprintf(os.Stderr, "Fail to open ")
+	}
+	dec1 := json.NewDecoder(file1)
+	err1 = dec1.Decode(&userList)
+	if err1 != io.EOF && err1 != nil {
+		// my_logger.Fatal("Fail to Decode USERING LIST")
+		fmt.Fprintf(os.Stderr, "Fail to Decode USERING LIST")
+
+	}
+	//读Meeting
+	file2, err2 := os.Open("./data/meetings.json")
+	defer file2.Close()
+	if err2 != nil {
+		// my_logger.Fatal("Fail to Decode Metting list")
+		fmt.Fprintf(os.Stderr, "Fail to open file meetings.json")
+	}
+	dec2 := json.NewDecoder(file2)
+	err2 = dec2.Decode(meetingList)
+	if err2 != io.EOF && err2 != nil {
+		// my_logger.Fatal("Fail to Decode Metting list")
+		fmt.Fprintf(os.Stderr, "Fail to Decode USERING LIST")
+	}
+
+	// 用户的登陆状态
 	return
 }
 
 // WriteToFile write all users and meetings to file
+// 把用户信息，会议信息和当前用户的登陆状态写入文件中
 // TODO
 func WriteToFile() {
+	file1, err1 := os.Create("./data/users.json")
+	defer file1.Close()
+	if err1 != nil {
+		// my_logger.Fatal("Fail to create UserInfo")
+		fmt.Fprintf(os.Stderr, "Fail to create UserInfo")
+	}
+	enc1 := json.NewEncoder(file1)
+	if err1 := enc1.Encode(&userList); err1 != nil {
+		fmt.Fprintf(os.Stderr, "Fail to encode")
+	}
+	//写Meeting
+	file2, err2 := os.Create("./data/meetings.json")
+	defer file2.Close()
+	if err2 != nil {
+		fmt.Fprintf(os.Stderr, "Fail to create MeetingInfo")
+	}
+	enc2 := json.NewEncoder(file2)
+	if err2 := enc2.Encode(&meetingList); err2 != nil {
+		fmt.Fprintf(os.Stderr, "Fail to encode")
+	}
+
+}
+
+// 把当前登陆的用户名写入文件中
+func CacheLoginState() bool {
+	return true
+}
+
+// 恢复登陆用户状态
+func ResotreLoginState() (username string) {
+	username = ""
+	cache, err := os.Open("./data/cahce.json")
+	defer cache.Close()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Fail reading cache")
+	}
+	scanner := bufio.NewScanner(cache)
+	// scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		// username = (string)scanner.Text()
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
 	return
 }
 
@@ -97,6 +186,7 @@ func deleteMeeting(filter mFilter) int {
 			n++
 		}
 	}
+	// 更改meeting list 中的内容
 	meetingList = meetingList[:len(meetingList)-n]
 	return n
 }

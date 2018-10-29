@@ -55,6 +55,11 @@ func (m *Meeting) setTitle(t string) {
 	m.Title = t
 }
 
+// 返回会议成员数目
+func (m *Meeting) getMeetingMemberNumber() int {
+	return len(m.Participators)
+}
+
 func (m Meeting) isParticipator(name string) bool {
 	for _, t := range m.Participators {
 		if t == name {

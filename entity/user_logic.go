@@ -1,18 +1,24 @@
 package entity
 
+import "fmt"
+
 // 处理用户相关逻辑
 // AgendaStart invoked when start
 func AgendaStart() bool {
+	// 名字为空代表没有登陆
+	CurrentUser.setName("")
 	ReadFromFile()
+	fmt.Print("hello")
 	// ReadCurrentUser()
-	// if CurrentUser.Name == "" {
-	// 	return false
-	// }
+	if CurrentUser.Name == "" {
+		return false
+	}
 	return true
 }
 
 // AgendaEnd invoked when quit
 func AgendaEnd() {
+	// 把磁盘文件读入
 	WriteToFile()
 	// writeCurrentUser()
 }
@@ -23,7 +29,7 @@ func AgendaEnd() {
 //@return if success, true will be returned
 //登录命令不需要调用StartAgenda,但需要调用QuitAgenda来保存登录信息
 func UserLogin(userName string, password string) bool {
-	ReadFromFile()
+	// ReadFromFile()
 	if CurrentUser.Name != "" {
 		return false
 	}
@@ -41,48 +47,64 @@ func UserLogin(userName string, password string) bool {
 	}
 }
 
-/**
- * regist a user
- * @param userName new user's username
- * @param password new user's password
- * @param email new user's email
- * @param phone new user's phone
- * @return if success, true will be returned
- */
+// UserLogout 用户登出
+func UserLogout() bool {
+	if CurrentUser.getName() != "" {
+		return false
+	} else {
+		CurrentUser.setName("")
+		return true
+	}
+}
+
+// UserRegister
+// @param userName new user's username
+// @param password new user's password
+// @param email new user's email
+// @param phone new user's phone
+// @return if success, true will be returned
 func UserRegister(userName, password, email, phone string) bool {
 	filter := func(u *User) bool {
 		return u.getName() == userName
 	}
 	ulist := queryUser(filter)
 
+	// 查看是否出现重复
 	if len(ulist) == 0 {
 		createUser(User{userName, password, email, phone})
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 // DeleteUser delete user
 // @param userName user's username
 // @param password user's password
 // @return if success, true will be returned
+// 删除用户， 如果有该用户创建的会议后者存在该用户的会议，则解散会议。
 func DeleteUser(userName string, password string) bool {
 	uf := func(u *User) bool {
 		return (u.getName() == userName) && (u.getPassword() == password)
 	}
 	mf := func(m *Meeting) bool {
-		return m.getSponsor() == userName || m.isParticipator(userName)
+		if m.getSponsor() == userName {
+			return true
+		} else if m.isParticipator(userName) && len(m.Participators) == 1 {
+			return true
+		}
+		return false
 	}
 	if deleteUser(uf) != 0 {
 		deleteMeeting(mf)
-		if userName == CurrentUser.Name {
-			CurrentUser.InitUser("", "", "", "")
+
+		// 如果删除的是当前登陆的用户，需要登出
+		if userName == CurrentUser.getName() {
+			UserLogout()
 		}
 		return true
-	} else {
-		return false
 	}
+
+	return false
 }
 
 //ListAllUsers list all users from storage
