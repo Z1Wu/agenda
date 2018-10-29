@@ -1,18 +1,27 @@
 package entity
 
-import "fmt"
-
 // 处理用户相关逻辑
 // AgendaStart invoked when start
 func AgendaStart() bool {
 	// 名字为空代表没有登陆
 	CurrentUser.setName("")
+
 	ReadFromFile()
-	fmt.Print("hello")
+	// fmt.Print("hello")
 	// ReadCurrentUser()
-	if CurrentUser.Name == "" {
+
+	// 获取登陆信息
+	curusername := ResotreLoginState()
+
+	if curusername == "" {
 		return false
 	}
+
+	// no error here
+	CurrentUser = queryUser(func(u *User) bool {
+		return u.getName() == curusername
+	})[0]
+
 	return true
 }
 
@@ -20,7 +29,7 @@ func AgendaStart() bool {
 func AgendaEnd() {
 	// 把磁盘文件读入
 	WriteToFile()
-	// writeCurrentUser()
+	CacheLoginState()
 }
 
 // UserLogin if the username match password

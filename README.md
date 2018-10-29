@@ -47,6 +47,13 @@
 
 - register
 
+    - 添加新用户，检查是否存在用户之间的重复
+    
+    - 选项
+        - -n | --name: 名字
+        - -k | --key: 密码
+        - -e | --email：邮箱
+        - -p | --phone: 电话
 - login
 
 - logout
