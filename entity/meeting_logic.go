@@ -1,4 +1,4 @@
-package service
+package entity
 
 // 处理和会议有关的逻辑
 
@@ -6,20 +6,18 @@ import (
 	"fmt"
 )
 
-/**
- * create a meeting
- * @param userName the sponsor's userName
- * @param title the meeting's title
- * @param participator the meeting's participator
- * @param startData the meeting's start date
- * @param endData the meeting's end date
- * @return if success, true will be returned
- */
+//create a meeting
+//@param userName the sponsor's userName
+//@param title the meeting's title
+//@param participator the meeting's participator
+//@param startData the meeting's start date
+//@param endData the meeting's end date
+//@return if success, true will be returned
 func CreateMeeting(userName, title, startDate, endDate string, participator []string) bool {
 	var sd Date
 	var ed Date
-	sd = stringToDate(startDate)
-	ed = stringToDate(endDate)
+	sd = buildDateFromString(startDate)
+	ed = buildDateFromString(endDate)
 
 	if (!sd.isValid()) || (!ed.isValid()) {
 		fmt.Println("日期不合法")
@@ -72,8 +70,8 @@ func CreateMeeting(userName, title, startDate, endDate string, participator []st
 			return false
 		}
 		if (userName == m.getSponsor() || m.isParticipator(userName)) &&
-			(sd.GreaterOrEqual(stringToDate(m.getEndDate())) ||
-				ed.SmallerOrEqual(stringToDate(m.getStartDate()))) {
+			(sd.GreaterOrEqual(buildDateFromString(m.getEndDate())) ||
+				ed.SmallerOrEqual(buildDateFromString(m.getStartDate()))) {
 			return false
 		} else {
 			return true
@@ -92,8 +90,8 @@ func CreateMeeting(userName, title, startDate, endDate string, participator []st
 				return false
 			}
 			if (p == m.getSponsor() || m.isParticipator(p)) &&
-				(sd.GreaterOrEqual(stringToDate(m.getEndDate())) ||
-					ed.SmallerOrEqual(stringToDate(m.getStartDate()))) {
+				(sd.GreaterOrEqual(buildDateFromString(m.getEndDate())) ||
+					ed.SmallerOrEqual(buildDateFromString(m.getStartDate()))) {
 				return false
 			} else {
 				return true
@@ -145,8 +143,8 @@ func CreateMeeting(userName, title, startDate, endDate string, participator []st
  */
 func MeetingQuery(sponsor, startDate, endDate string) []Meeting {
 	var ttt []Meeting
-	sd := stringToDate(startDate)
-	ed := stringToDate(endDate)
+	sd := buildDateFromString(startDate)
+	ed := buildDateFromString(endDate)
 	if sd.isMoreThan(ed) || !sd.isValid() || !ed.isValid() {
 		fmt.Println("日期不合法")
 		return ttt //此时a为空
@@ -154,11 +152,11 @@ func MeetingQuery(sponsor, startDate, endDate string) []Meeting {
 
 	filter := func(a *Meeting) bool {
 		if (a.Sponsor == sponsor || a.isParticipator(sponsor)) &&
-			(stringToDate(a.getEndDate()).GreaterOrEqual(sd) && stringToDate(a.getStartDate()).SmallerOrEqual(sd)) {
+			(buildDateFromString(a.getEndDate()).GreaterOrEqual(sd) && buildDateFromString(a.getStartDate()).SmallerOrEqual(sd)) {
 			return true
 		}
 		if (a.Sponsor == sponsor || a.isParticipator(sponsor)) &&
-			(stringToDate(a.getStartDate()).SmallerOrEqual(ed)) && stringToDate(a.getStartDate()).GreaterOrEqual(sd) {
+			(buildDateFromString(a.getStartDate()).SmallerOrEqual(ed)) && buildDateFromString(a.getStartDate()).GreaterOrEqual(sd) {
 			return true
 		}
 		return false
@@ -275,16 +273,16 @@ func Addparticipator(title string, participator []string) bool {
 		}
 	}
 	/*-------------------6--------------------------*/
-	sd := stringToDate(mlist[0].StartDate)
-	ed := stringToDate(mlist[0].EndDate)
+	sd := buildDateFromString(mlist[0].StartDate)
+	ed := buildDateFromString(mlist[0].EndDate)
 	filter2 := func(m *Meeting) bool {
 		for _, p := range participator {
 			if !(p == m.getSponsor() || m.isParticipator(p)) {
 				return false
 			}
 			if (p == m.getSponsor() || m.isParticipator(p)) &&
-				(sd.GreaterOrEqual(stringToDate(m.getEndDate())) ||
-					ed.SmallerOrEqual(stringToDate(m.getStartDate()))) {
+				(sd.GreaterOrEqual(buildDateFromString(m.getEndDate())) ||
+					ed.SmallerOrEqual(buildDateFromString(m.getStartDate()))) {
 				return false
 			} else {
 				return true
@@ -305,8 +303,8 @@ func Addparticipator(title string, participator []string) bool {
 				return false
 			}
 			if (p == m.getSponsor() || m.isParticipator(p)) &&
-				(sd.GreaterOrEqual(stringToDate(m.getEndDate())) ||
-					ed.SmallerOrEqual(stringToDate(m.getStartDate()))) {
+				(sd.GreaterOrEqual(buildDateFromString(m.getEndDate())) ||
+					ed.SmallerOrEqual(buildDateFromString(m.getStartDate()))) {
 				return false
 			} else {
 				return true
@@ -326,9 +324,9 @@ func Addparticipator(title string, participator []string) bool {
 	}
 
 	//写回原会议
-	for i, m := range meetinglist {
+	for i, m := range meetingList {
 		if m.Title == mlist[0].Title {
-			meetinglist[i] = mlist[0]
+			meetingList[i] = mlist[0]
 		}
 	}
 
@@ -389,10 +387,10 @@ func Removeparticipator(title string, participator []string) bool {
 	}
 	/*----------------------7-----------------------*/
 
-	//重新写回meetinglist
-	for i, m := range meetinglist {
+	//重新写回meetingList
+	for i, m := range meetingList {
 		if m.Title == mlist[0].Title {
-			meetinglist[i] = mlist[0]
+			meetingList[i] = mlist[0]
 		}
 	}
 
@@ -447,10 +445,10 @@ func QuitMeeting(title string) bool {
 	mlist[0].Participators = mlist[0].Participators[:len(mlist[0].Participators)-n]
 	/*----------------------7-----------------------*/
 
-	//重新写回meetinglist
-	for i, m := range meetinglist {
+	//重新写回meetingList
+	for i, m := range meetingList {
 		if m.Title == mlist[0].Title {
-			meetinglist[i] = mlist[0]
+			meetingList[i] = mlist[0]
 		}
 	}
 

@@ -1,30 +1,28 @@
-package service
+package entity
 
-// 处理用户逻辑
-
-//不要在login后调用StartAgenda
-func StartAgenda() bool {
+// 处理用户相关逻辑
+// AgendaStart invoked when start
+func AgendaStart() bool {
 	ReadFromFile()
-	ReadCurrentUser()
-	if CurrentUser.Name == "" {
-		return false
-	}
+	// ReadCurrentUser()
+	// if CurrentUser.Name == "" {
+	// 	return false
+	// }
 	return true
 }
 
-func QuitAgenda() {
-	writeToFile()
-	writeCurrentUser()
+// AgendaEnd invoked when quit
+func AgendaEnd() {
+	WriteToFile()
+	// writeCurrentUser()
 }
 
-/**
-* check if the username match password
-* @param userName the username want to login
-* @param password the password user enter
-* @return if success, true will be returned
- */
+// UserLogin if the username match password
+//@param userName the username want to login
+//@param password the password user enter
+//@return if success, true will be returned
 //登录命令不需要调用StartAgenda,但需要调用QuitAgenda来保存登录信息
-func UserLogIn(userName string, password string) bool {
+func UserLogin(userName string, password string) bool {
 	ReadFromFile()
 	if CurrentUser.Name != "" {
 		return false
@@ -65,12 +63,10 @@ func UserRegister(userName, password, email, phone string) bool {
 	}
 }
 
-/**
- * delete a user
- * @param userName user's username
- * @param password user's password
- * @return if success, true will be returned
- */
+// DeleteUser delete user
+// @param userName user's username
+// @param password user's password
+// @return if success, true will be returned
 func DeleteUser(userName string, password string) bool {
 	uf := func(u *User) bool {
 		return (u.getName() == userName) && (u.getPassword() == password)
@@ -89,10 +85,8 @@ func DeleteUser(userName string, password string) bool {
 	}
 }
 
-/**
- * list all users from storage
- * @return a user list result
- */
+//ListAllUsers list all users from storage
+//@return a user list result
 func ListAllUsers() []User {
 	filter := func(u *User) bool {
 		return true
