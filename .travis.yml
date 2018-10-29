@@ -1,0 +1,8 @@
+language: go
+
+go :
+	- master
+
+go_import_path: github.com/Z1Wu/agenda
+
+script: go test ./entity/storage_handler_test.go
