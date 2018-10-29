@@ -123,7 +123,7 @@ func CreateMeeting(userName, title, startDate, endDate string, participator []st
 		}
 	}
 
-	/*-------------------8--------------------------*/
+	/*-----------参与者是否为空-----------------*/
 	if len(participator) == 0 {
 		fmt.Println("参与者不能为空")
 		return false
@@ -215,12 +215,12 @@ func DeleteAllMeetings(name string) bool {
 */
 /* 增加参会者 */
 func Addparticipator(title string, participator []string) bool {
-	/*---------------------1------------------------*/
+
 	if len(participator) == 0 {
 		fmt.Println("必须至少添加一个参与者")
 		return false
 	}
-	/*---------------------2------------------------*/
+
 	filter1 := func(m *Meeting) bool {
 		return m.Sponsor == CurrentUser.Name && m.Title == title
 	}
@@ -230,7 +230,7 @@ func Addparticipator(title string, participator []string) bool {
 		fmt.Println("找不到当前用户创建的该会议")
 		return false
 	}
-	/*---------------------3------------------------*/
+
 	for i := 0; i < len(participator); i++ {
 		for j := i + 1; j < len(participator); j++ {
 			if participator[i] == participator[j] {
@@ -239,7 +239,7 @@ func Addparticipator(title string, participator []string) bool {
 			}
 		}
 	}
-	/*----------------------4-----------------------*/
+
 	for _, p := range mlist[0].Participators {
 		for _, pp := range participator {
 			if pp == p {
@@ -248,14 +248,14 @@ func Addparticipator(title string, participator []string) bool {
 			}
 		}
 	}
-	/*----------------------5-----------------------*/
+
 	for _, p := range participator {
 		if CurrentUser.Name == p {
 			fmt.Println("参与者不能有发起者")
 			return false
 		}
 	}
-	/*-------------------6--------------------------*/
+
 	start := buildDateFromString(mlist[0].StartDate)
 	end := buildDateFromString(mlist[0].EndDate)
 	filter2 := func(m *Meeting) bool {
@@ -279,7 +279,6 @@ func Addparticipator(title string, participator []string) bool {
 		return false
 	}
 
-	/*---------------------------------------------*/
 	//add
 	for _, p := range participator {
 		mlist[0].Participators = append(mlist[0].Participators, p)
@@ -297,7 +296,7 @@ func Addparticipator(title string, participator []string) bool {
 
 /* 删除参会者 */
 func Removeparticipator(title string, participator []string) bool {
-	/*---------------------1------------------------*/
+
 	if len(participator) == 0 {
 		fmt.Println("必须至少删除一个参与者")
 		return false
