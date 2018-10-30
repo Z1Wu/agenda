@@ -17,27 +17,33 @@ package cmd
 import (
 	"fmt"
 	"os"
-
+	"log"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
+var logFileName string = "Info_First.log"
+var logFile *os.File
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "agenda",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "A meeting management program.",
+	Long: `This is a meeting management program. You can use this program to manage your meeting system.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		logFile, _ = os.OpenFile(logFileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+		debugLog := log.New(logFile,"[Execute]", log.Ldate|log.Ltime|log.Lshortfile)
+		debugLog.Printf("%v\n", os.Args[1:])
+	  },
+	  PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		logFile.Sync()
+		logFile.Close()
+	  },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
