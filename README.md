@@ -43,37 +43,20 @@
 
 ## 命令详情
 
-// 用户相关
 
-- register
-
-    - 添加新用户，检查是否存在用户之间的重复
-    
-    - 选项
-        - -n | --name: 名字
-        - -k | --key: 密码
-        - -e | --email：邮箱
-        - -p | --phone: 电话
-- login
-
-- logout
-
-// 会议相关
-
-- deleteAllMeeting
- 
-- createMeeting
-
-- addUser
-
-- queryUser
-
-- queryMeeting
-
-- quitFromMeeting
-
-- removeUserFromMeeting
-
-// 其他
-
-- help
+命令集合
+// 
+- add            To add Participators of the meeting    
+- cancel         Cancel a meeting named MeetingName     
+- clear          Cancel all the meeting created by the current user
+- [√]creat          Create a meeting
+- [√]delete         Delete a user
+- [√]help           Help about any command
+- [√]listAllMeeting List all meetings the sponsor created
+- [√]listAllUser    List all users' name
+- [√]login          Login to the meeting system.
+- [√]logout         Logout the meeting system
+- query          To query all the meeting have attended during [StartTime] and [EndTime]
+- quit           quit the meeting with the name [MeetingName]
+- [√]regist         register a new user
+- remove         To remove Participator from the meeting
