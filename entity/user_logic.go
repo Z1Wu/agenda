@@ -124,3 +124,11 @@ func ListAllUsers() []User {
 	}
 	return queryUser(filter)
 }
+
+// QueryUserByName return user with the specify name
+func QueryUserByName(username string) []User {
+	filter := func(u *User) bool {
+		return u.getName() == username
+	}
+	return queryUser(filter)
+}
