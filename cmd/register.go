@@ -25,27 +25,27 @@ import (
 
 // registerCmd represents the register command
 var registerCmd = &cobra.Command{
-	Use:   "register",
+	Use:   "regist -n [UserName] -c [PassWord] -e [Email] -t [Phone]",
 	Short: "register a new user",
 	// TODO
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Long: `To create a news user for the meeting agenda system. You have to come up with a username, your password, your email, your phone.
+	[UserNme] is new user's name
+	[PassWord] is new user's password
+	[Email] is new user's email
+	[Phone] is new user's phone.`,
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("register called")
 		// 无论是否已经登陆都可以进行注册。
-
-		u, _ := cmd.Flags().GetString("username")
-		k, _ := cmd.Flags().GetString("key")
+		entity.ReadFromFile()
+		n, _ := cmd.Flags().GetString("username")
+		c, _ := cmd.Flags().GetString("password")
 		e, _ := cmd.Flags().GetString("email")
-		p, _ := cmd.Flags().GetString("phone")
+		t, _ := cmd.Flags().GetString("phone")
 
 		// 任何命令都要在结束之前退出
 		defer entity.AgendaEnd()
-		if entity.UserRegister(u, k, e, p) {
+		if entity.UserRegister(n, c, e, t) {
 			log.Print("Successful Rergister")
 		} else {
 			log.Fatal("Register fail")
@@ -63,10 +63,10 @@ func init() {
 	// and all subcommands, e.g.:
 	// registerCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	registerCmd.Flags().StringP("username", "u", "", "new user's username")
-	registerCmd.Flags().StringP("key", "k", "", "new user's password")
+	registerCmd.Flags().StringP("username", "n", "", "new user's username")
+	registerCmd.Flags().StringP("password", "c", "", "new user's password")
 	registerCmd.Flags().StringP("email", "e", "", "new user's email")
-	registerCmd.Flags().StringP("phone", "p", "", "phone new user's phone")
+	registerCmd.Flags().StringP("phone", "t", "", "phone new user's phone")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
