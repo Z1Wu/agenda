@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/spf13/cobra"
@@ -35,7 +34,7 @@ var registerCmd = &cobra.Command{
 	[Phone] is new user's phone.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("register called")
+		// fmt.Println("register called")
 		// 无论是否已经登陆都可以进行注册。
 		entity.ReadFromFile()
 		n, _ := cmd.Flags().GetString("username")

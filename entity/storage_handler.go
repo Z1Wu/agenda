@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 )
 
 type uFilter func(*User) bool
@@ -41,10 +42,10 @@ func ReadFromFile() {
 	}
 	dec1 := json.NewDecoder(file1)
 	err1 = dec1.Decode(&userList)
-	if err1 != io.EOF && err1 != nil {
-		// my_logger.Fatal("Fail to Decode USERING LIST")
-		fmt.Fprintf(os.Stderr, "Fail to Decode USERING LIST")
-
+	if err1 != nil {
+		// my_logger.Fatal("Fail to Decode USERS LIST")
+		log.Print("DECODE USERLIST, EMPTY USERLIST")
+		// log.Fatal(err1)
 	}
 	//读Meeting
 	file2, err2 := os.Open("./data/meetings.json")
@@ -52,12 +53,14 @@ func ReadFromFile() {
 	if err2 != nil {
 		// my_logger.Fatal("Fail to Decode Metting list")
 		fmt.Fprintf(os.Stderr, "Fail to open file meetings.json")
+		log.Fatal(err2)
 	}
 	dec2 := json.NewDecoder(file2)
-	err2 = dec2.Decode(meetingList)
-	if err2 != io.EOF && err2 != nil {
-		// my_logger.Fatal("Fail to Decode Metting list")
-		fmt.Fprintf(os.Stderr, "Fail to Decode USERING LIST")
+	// should pass the argument as a pointer
+	err2 = dec2.Decode(&meetingList)
+	if err2 != nil {
+		log.Print("DECODE MEETING LIST, EMPTY MEETINGLIST")
+		log.Fatal(err2)
 	}
 
 	// 用户的登陆状态
@@ -117,6 +120,8 @@ func ResotreLoginState() (username string) {
 	reader := bufio.NewReader(cache)
 
 	username, err = reader.ReadString('\n')
+	// remove the last newline character
+	username = strings.TrimSuffix(username, "\n")
 
 	if err != nil && err != io.EOF {
 		log.Fatal(err)

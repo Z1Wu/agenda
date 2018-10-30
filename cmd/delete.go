@@ -17,6 +17,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+
 	entity "github.com/Z1Wu/agenda/entity"
 	"github.com/spf13/cobra"
 )
@@ -27,22 +28,31 @@ var deleteCmd = &cobra.Command{
 	Short: "Delete a user",
 	Long: `You can delete your account from the meeting management system' database.
 	P.S: After your deleting, you won't be able to log in  with this username and password again any more.`,
-	
+
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("delete called")
-		debugLog := log.New(logFile,"[Result]", log.Ldate|log.Ltime|log.Lshortfile)
+		debugLog := log.New(logFile, "[Result]", log.Ldate|log.Ltime|log.Lshortfile)
 		if entity.AgendaStart() == false {
 			debugLog.Println("Fail, please log in")
 			fmt.Println("Fail, please log in")
 		}
 
-		if entity.DeleteUser(entity.CurrentUser.Name, entity.CurrentUser.Password) {
+		userToDelete, _ := cmd.Flags().GetString("username")
+		// password, _ := cmd.Flags().GetString("password")
+
+		if userToDelete != entity.CurrentUser.Name {
+			debugLog.Println("access denied")
+			fmt.Println("access denied, can't delete other user")
+		} else if entity.DeleteUser(entity.CurrentUser.Name, entity.CurrentUser.Password) {
 			debugLog.Println("Delete this account successfully")
 			fmt.Println("Delete this account successfully")
 		} else {
 			debugLog.Println("Fail to delete this account")
 			fmt.Println("Fail to delete this account")
 		}
+
+		// 只能删除自己, 检查输入的密码是否正确
+
 		entity.AgendaEnd()
 	},
 }

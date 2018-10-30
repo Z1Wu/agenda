@@ -30,16 +30,17 @@ var listAllUsersCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("listAllUsers called")
 		debugLog := log.New(logFile, "[Result]", log.Ldate|log.Ltime|log.Lshortfile)
+		defer entity.AgendaEnd()
 		if entity.AgendaStart() == false {
 			debugLog.Println("Fail, please log in")
-			fmt.Println("Fail, please log in\n")
+			fmt.Println("Fail, please log in")
+			return
 		}
 		uu := entity.ListAllUsers()
 		fmt.Println("Name Email Telephone")
 		for i, u := range uu {
 			fmt.Printf("%d. %s %s %s\n", i+1, u.Name, u.Email, u.Phone)
 		}
-		entity.AgendaEnd()
 	},
 }
 

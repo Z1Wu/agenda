@@ -17,6 +17,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+
 	entity "github.com/Z1Wu/agenda/entity"
 	"github.com/spf13/cobra"
 )
@@ -30,13 +31,17 @@ var logoutCmd = &cobra.Command{
 	login -n [UserName] -pass [PassWord]`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("logout called")
-		entity.AgendaStart()
-		debugLog := log.New(logFile,"[Result]", log.Ldate|log.Ltime|log.Lshortfile)
-		entity.CurrentUser.InitUser("", "", "", "")
-
-		debugLog.Println("Log out successfully")
-		fmt.Println("Log out successfully")
-		entity.AgendaEnd()
+		debugLog := log.New(logFile, "[Result]", log.Ldate|log.Ltime|log.Lshortfile)
+		if entity.AgendaStart() == true {
+			entity.CurrentUser.InitUser("", "", "", "")
+			debugLog.Println("Log out successfully")
+			fmt.Println("Log out successfully")
+		} else {
+			// debugLog := log.New(logFile, "[Result]", log.Ldate|log.Ltime|log.Lshortfile)
+			debugLog.Println("You already logout")
+			fmt.Println("You already logout")
+		}
+		defer entity.AgendaEnd()
 	},
 }
 
