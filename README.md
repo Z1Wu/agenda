@@ -49,14 +49,31 @@
 - add            To add Participators of the meeting    
 - cancel         Cancel a meeting named MeetingName     
 - clear          Cancel all the meeting created by the current user
-- [√]creat          Create a meeting
-- [√]delete         Delete a user
-- [√]help           Help about any command
-- [√]listAllMeeting List all meetings the sponsor created
-- [√]listAllUser    List all users' name
-- [√]login          Login to the meeting system.
-- [√]logout         Logout the meeting system
+- creat          Create a meeting
+- delete         Delete a user
+- help           Help about any command
+- listAllMeeting List all meetings the sponsor created
+- listAllUser    List all users' name
+- login          Login to the meeting system.
+- logout         Logout the meeting system
 - query          To query all the meeting have attended during [StartTime] and [EndTime]
 - quit           quit the meeting with the name [MeetingName]
-- [√]regist         register a new user
+- regist         register a new user
 - remove         To remove Participator from the meeting
+
+命令具体使用方法
+//
+- 需要登录才能使用的功能：
+    - ./agenda add -n [加入参与者的姓名] -m [加入会议的名字]
+    - ./agenda cancel -m [取消的会议的名字] （在已经登录的用户发起的会议中取消指定会议）
+    - ./agenda clear
+    - ./agenda creat -m [创建的会议的名字] -s [开始时间，格式为：xxxx-xx-xx/xx:xx] -e [结束时间，格式为：xxxx-xx-xx/xx:xx] -p [参会者，不能为发起人]
+    - ./agenda listAllMeeting
+    - ./agenda listAllUser
+    - ./agenda query
+    - ./agenda quit -m [想要推出的会议的名字]
+    - ./agedna remove -p [想要移除的参会者的名字] -m [从中移除参会者的会议名字]
+ - 不需要登录即可使用的功能：
+    - ./agenda regist -n [创建的用户名] -c [创建的密码] -e [邮箱] -t [电话号码]
+    - ./agenda login -n [用户名]  -c [密码]
+    - ./agenda logout
