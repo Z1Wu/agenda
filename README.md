@@ -77,3 +77,5 @@
     - ./agenda regist -n [创建的用户名] -c [创建的密码] -e [邮箱] -t [电话号码]
     - ./agenda login -n [用户名]  -c [密码]
     - ./agenda logout
+    - ./agenda delete -n [要删除的用户的用户名] -c [要删除的用户的密码]
+    - ./agenda --help [产看所有的指令]
