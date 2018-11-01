@@ -9,18 +9,43 @@
 ## 应用架构
 
 - 文件结构:
-    - cmd => 表示层 // todo，命令的创建
-    
-        -  
-    - entity 
-----------------service => 编写业务逻辑，包括会议添加/删除，用户注册等----------------
+    - cmd => 表示层 // todo，命令的创建  
         
-        - user_logic.go // 用户相关逻辑（包括：用户添加，登陆等）
+        - add.go            To add Participators of the meeting            
+        
+        - cancel.go         Cancel a meeting named MeetingName     
+        
+        - clear.go          Cancel all the meeting created by the current user
+        
+        - creat.go          Create a meeting
+        
+        - delete.go         Delete a user
+        
+        - help.go           Help about any command
+        
+        - listAllMeeting.go List all meetings the sponsor created
+        
+        - listAllUser.go    List all users' name
+        
+        - login.go          Login to the meeting system.
+        
+        - logout.go         Logout the meeting system
+        
+        - query.go          To query all the meeting have attended during [StartTime] and [EndTime]
+        
+        - quit.go           quit the meeting with the name [MeetingName]
+        
+        - regist.go         register a new user
+        
+        - remove.go         // 删除用户
+        
+        - root.go           cobra 文件
+    - entity =>  服务层和存储层文件  
+        
+        - use r_logic.go // 用户相关逻辑（包括：用户添加，登陆等）
 
         - meetting_logic.go // 会议相关逻辑（会议创建，成员加入等）
   
------------------storage => 处理存储数据------------
-
         - storage_hanlder.go => 处理数据的读写
         
         - date.go => 定义date
@@ -30,7 +55,7 @@
         - meeting.go => 定义meeting
     
     - data => 储存用户数据和会议数据
-    
+
         - meetings.json
     
         - users.json
@@ -38,32 +63,35 @@
         - cache.json
             - 记录当前的登陆信息，在用户登陆之后，可以会把登陆的用户的用户名写进该文件中。
             - 另外，由于如果没有手动调用logout，之后登陆的信息不会被消除
-    main.go // cobra 文件
+    
+    - 实验截图 =》简单的检测命令功能是否正常 
+        - ...
+
+    - main.go // cobra
+    - travis.yml // CI
 
 
-## 命令详情
+## 命令具体使用方法
+
+- 需要登录才能使用的功能：
+    - ./agenda add -n [加入参与者的姓名] -m [加入会议的名字]
+    - ./agenda cancel -m [取消的会议的名字] （在已经登录的用户发起的会议中取消指定会议）
+    - ./agenda clear
+    - ./agenda creat -m [创建的会议的名字] -s [开始时间，格式为：xxxx-xx-xx/xx:xx] -e [结束时间，格式为：xxxx-xx-xx/xx:xx] -p [参会者，不能为发起人]
+    - ./agenda listAllMeeting
+    - ./agenda listAllUser
+    - ./agenda query
+    - ./agenda quit -m [想要推出的会议的名字]
+    - ./agedna remove -p [想要移除的参会者的名字] -m [从中移除参会者的会议名字]
+- 不需要登录即可使用的功能：
+    - ./agenda regist -n [创建的用户名] -c [创建的密码] -e [邮箱] -t [电话号码]
+    - ./agenda login -n [用户名]  -c [密码]
+    - ./agenda logout
+    - ./agenda delete -n [要删除的用户的用户名] -c [要删除的用户的密码]
+    - ./agenda --help [产看所有的指令]
 
 
-命令集合
-// 
-- add            To add Participators of the meeting    
-- cancel         Cancel a meeting named MeetingName     
-- clear          Cancel all the meeting created by the current user
-- creat          Create a meeting
-- delete         Delete a user
-- help           Help about any command
-- listAllMeeting List all meetings the sponsor created
-- listAllUser    List all users' name
-- login          Login to the meeting system.
-- logout         Logout the meeting system
-- query          To query all the meeting have attended during [StartTime] and [EndTime]
-- quit           quit the meeting with the name [MeetingName]
-<<<<<<< HEAD
-- [√]regist         register a new user
-- remove         To remove Participator from the meeting
-
-
-## Golang debug in vscode
+## Golang debug in vscode（记录项目过程中的调试方法）
 
 ### 配置lauch.json
 
@@ -127,38 +155,52 @@
 "args": ["creat", "-m", "aliceMeeting", "-s", "2000-02-02/00:00", "-e", "2000-02-03/00:00", "-p", "a"], 
 ```
 
+下面就是本次实验的调试所用的 `launch.json`
+
+``` json
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "env": {},
+            // "args": ["listAllUser"], // arguments for list all users
+            // "args": ["login", "-n", "alice", "-c", "aaa"], // arguments for login  
+            // test logout
+            // "args": ["logout"]
+            // test register function
+            // "args": ["regist", "-n", "bob", "-c", "aaa", "-e", "bob@mail.com", "-t", "110"], // arguments for login  
+            // "args": ["regist", "-n", "alice", "-c", "aaa", "-e", "alice@mail.com", "-t", "110"], // arguments for login             
+            // test create a meeting
+            "args": ["creat", "-m", "aliceMeeting", "-s", "2000-02-02/00:00", "-e", "2000-02-03/00:00", "-p", "a"], 
+            // test for list all meeting
+            // "args": ["listAllMeeting"],  test pass           
+            // test delte a user, logined user alice delete bob's account
+            // "args": ["delete", "-n", "bob", "-c", "aaa"],  //test pass           
+            // "args": ["", "-m", "aliceMeeting", "-s", "2000-02-02/00:00", "-e", "2000-02-03/00:00", "-p", "a"], 
+            // arguments for list all meeting
+            // "args": ["creat", "-m", "aliceMeeting", "-s", "2000-02-02/00:00", "-e", "2000-02-03/00:00", "-p", "a"],
+        }
+    ]
+}
+```
+
 ### 设置断点
 
-设置断点的方式, 
+设置断点的方式
 
 1. 普通断点的设置: 直接在行号的左边点击，出现红点就是断点
 
 2. 条件断点的设置：在普通断点处点击右键` edit the break point`， 输入需要需要的条件, 当条件为`True`断点生效
 
-3. 
+### debuger pannel
 
+调试的界面和其他的调试工具大同小异，包括查看调用栈等
 
-### 
-=======
-- regist         register a new user
-- remove         To remove Participator from the meeting
-
-命令具体使用方法
-//
-- 需要登录才能使用的功能：
-    - ./agenda add -n [加入参与者的姓名] -m [加入会议的名字]
-    - ./agenda cancel -m [取消的会议的名字] （在已经登录的用户发起的会议中取消指定会议）
-    - ./agenda clear
-    - ./agenda creat -m [创建的会议的名字] -s [开始时间，格式为：xxxx-xx-xx/xx:xx] -e [结束时间，格式为：xxxx-xx-xx/xx:xx] -p [参会者，不能为发起人]
-    - ./agenda listAllMeeting
-    - ./agenda listAllUser
-    - ./agenda query
-    - ./agenda quit -m [想要推出的会议的名字]
-    - ./agedna remove -p [想要移除的参会者的名字] -m [从中移除参会者的会议名字]
- - 不需要登录即可使用的功能：
-    - ./agenda regist -n [创建的用户名] -c [创建的密码] -e [邮箱] -t [电话号码]
-    - ./agenda login -n [用户名]  -c [密码]
-    - ./agenda logout
-    - ./agenda delete -n [要删除的用户的用户名] -c [要删除的用户的密码]
-    - ./agenda --help [产看所有的指令]
->>>>>>> f3d5e5d73e0bc8cb43d40b14e19b637ca47484ef
