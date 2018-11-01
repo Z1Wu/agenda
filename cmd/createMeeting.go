@@ -34,11 +34,14 @@ var createMeetingCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("createMeeting called")
 		debugLog := log.New(logFile, "[Result]", log.Ldate|log.Ltime|log.Lshortfile)
-		if entity.AgendaStart() == false {
+		isLogin := entity.AgendaStart()
+		defer entity.AgendaEnd()
+		if isLogin == false {
 			debugLog.Println("Fail, please log in")
-			fmt.Println("Fail, please log in")
+			// fmt.Println("Fail, please log in")
+			log.Fatal("Fail, please log in")
 		}
-		m, _ := cmd.Flags().GetString("Title")
+		m, _ := cmd.Flags().GetString("MeetingName")
 		p, _ := cmd.Flags().GetStringSlice("Participators")
 		sd, _ := cmd.Flags().GetString("StartTime")
 		ed, _ := cmd.Flags().GetString("EndTime")
@@ -49,7 +52,6 @@ var createMeetingCmd = &cobra.Command{
 			debugLog.Println("Fail to create meeting")
 			fmt.Println("Fail to create meeting")
 		}
-		entity.AgendaEnd()
 	},
 }
 

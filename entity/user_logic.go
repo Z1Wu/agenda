@@ -1,5 +1,9 @@
 package entity
 
+import (
+	"log"
+)
+
 // 处理用户相关逻辑
 // AgendaStart invoked when start
 func AgendaStart() bool {
@@ -73,10 +77,22 @@ func UserLogout() bool {
 // @param phone new user's phone
 // @return if success, true will be returned
 func UserRegister(userName, password, email, phone string) bool {
+
+	if userName == "" {
+		log.Fatal("invalid user name")
+	} else if password == "" {
+		log.Fatal("invalid password")
+	} else if email == "" {
+		log.Fatal("invalid email")
+	} else if phone == "" {
+		log.Fatal("invalid phone")
+	}
 	filter := func(u *User) bool {
 		return u.getName() == userName
 	}
 	ulist := queryUser(filter)
+
+	// 检查合法性.
 
 	// 查看是否出现重复
 	if len(ulist) == 0 {

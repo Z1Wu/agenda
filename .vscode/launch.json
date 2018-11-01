@@ -19,7 +19,7 @@
             // "args": ["regist", "-n", "bob", "-c", "aaa", "-e", "bob@mail.com", "-t", "110"], // arguments for login  
             // "args": ["regist", "-n", "alice", "-c", "aaa", "-e", "alice@mail.com", "-t", "110"], // arguments for login              
             // test create a meeting
-            // "args": ["creat", "-m", "aliceMeeting", "-s", "2000-02-02/00:00", "-e", "2000-02-03/00:00", "-p", "a"], 
+            "args": ["creat", "-m", "aliceMeeting", "-s", "2000-02-02/00:00", "-e", "2000-02-03/00:00", "-p", "a"], 
             // test for list all meeting
             // "args": ["listAllMeeting"],  test pass           
             // test delte a user, logined user alice delete bob's account
