@@ -9,7 +9,7 @@
 ## 应用架构
 
 - 文件结构:
-    - cmd => 表示层 // todo，命令的创建  
+    - cmd => 表示层 //命令的创建  
         
         - add.go            To add Participators of the meeting            
         
@@ -62,6 +62,7 @@
     
         - cache.json
             - 记录当前的登陆信息，在用户登陆之后，可以会把登陆的用户的用户名写进该文件中。
+
             - 另外，由于如果没有手动调用logout，之后登陆的信息不会被消除
     
     - 实验截图 =》简单的检测命令功能是否正常 
@@ -89,6 +90,25 @@
     - ./agenda logout
     - ./agenda delete -n [要删除的用户的用户名] -c [要删除的用户的密码]
     - ./agenda --help [产看所有的指令]
+
+
+## 添加Travis CI
+
+### what is Travis CI
+
+首先需要了解一下什么 `CI`， `CI` 是 `Continuous Integration`，个人理解，简单来说就是不停的把小的变化集成到项目中，而不是等到最后有了一个很大的变再把项目集成，关键在于每次集成的时候需要保证新添加入的变化不会影响已经有的功能，或者应该有的功能是否达到预期效果。`Travis CI` 一个平台，每次你把代码 `commit and push` 到 github 上的时候, 会按照你的要求常见一个虚拟环境，在虚拟环境中使用你已经编写好的测试文件来测试代码。 
+
+
+### How to use
+
+1. 使用 repo owner 的 github 账户登陆 travis， 并授权给 travis。
+
+2. 在对应的项目处，点击 `activate` 开启对这个仓库的CI
+
+3. 编写测试文件，在Go语言中，测试文件的命名有特殊的要求，以 `_test.go`结尾的文件都是测试文件。
+
+4. 在项目的根目录中写好 `travis.yml`指定测试环境和测试文件。
+
 
 
 ## Golang debug in vscode（记录项目过程中的调试方法）
