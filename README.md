@@ -1,5 +1,7 @@
 # 服务计算第三次作业
 
+[![Build Status](https://travis-ci.com/Z1Wu/agenda.svg?branch=master)](https://travis-ci.com/Z1Wu/agenda)
+
 ## 命名规范
 
 - 文件名字：使用小写字母的加下划线
