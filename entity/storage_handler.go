@@ -31,7 +31,6 @@ var CurrentUser User
 
 // ReadFromFile read the user and meeting from file
 // 把数据从文件中读取进入内存，包括用户信息和文件
-// TODO
 func ReadFromFile() {
 	//读user
 	file1, err1 := os.Open("./data/users.json")
@@ -148,17 +147,6 @@ func queryUser(filter uFilter) []User {
 	return dy
 }
 
-// func updateUser(filter uFilter, switcher uSwitcher) int {
-// 	n := 0
-// 	for _, u := range userList {
-// 		if filter(&u) {
-// 			switcher(&u)
-// 			n++
-// 		}
-// 	}
-// 	return n
-// }
-
 func deleteUser(filter uFilter) int {
 	n := 0
 	for i, u := range userList {
@@ -180,17 +168,6 @@ func queryMeeting(filter mFilter) []Meeting {
 	}
 	return dy
 }
-
-// func updateMeeting(filter mFilter, switcher mSwitcher) int {
-// 	n := 0
-// 	for _, m := range meetingList {
-// 		if filter(&m) {
-// 			switcher(&m)
-// 			n++
-// 		}
-// 	}
-// 	return n
-// }
 
 func deleteMeeting(filter mFilter) int {
 	n := 0

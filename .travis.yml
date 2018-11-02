@@ -1,8 +1,8 @@
 language: go
 
 go :
-	- master
+- master
 
 go_import_path: github.com/Z1Wu/agenda
 
-script: go test ./entity
+script: go test -v ./entity
